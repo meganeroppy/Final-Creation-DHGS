@@ -96,6 +96,13 @@ public class PlayerObserver : MonoBehaviour
 	/// </summary>
 	bool CheckIsTargetBackSide()
 	{
+		// プレイヤーが有効な位置いいなければ判定しない
+		if( !structures[0].inArea )
+		{
+			Debug.Log("プレイヤーが有効範囲にいない");
+			return false;
+		}
+
 		// 対象の構造に対してのどの方向を向いているか調べる
 		Vector3 tPos = structures[0].transform.position;
 		Vector3 pPos = observee.transform.position;
@@ -105,18 +112,18 @@ public class PlayerObserver : MonoBehaviour
 		// Debug.Log("正面の角度 : " + aim.ToString() );
 
 		float back = aim >= 180f ? aim - 180f : aim + 180f;
-		Debug.Log("背後の角度 : " + back.ToString() );
+	//	Debug.Log("背後の角度 : " + back.ToString() );
 
 		// プレイヤーの角度(degree)
 		float pRot = observee.transform.rotation.eulerAngles.y;
-		Debug.Log( "プレイヤーの回転 : " + pRot.ToString() );
+	//	Debug.Log( "プレイヤーの回転 : " + pRot.ToString() );
 
 		// 正面角度から何度の角度差があるか？
 		float rotDiff = Mathf.Abs( back - pRot );
 		if( rotDiff >= 180f ) {
 			rotDiff = 360f - rotDiff;
 		}
-		Debug.Log( "背後角度から" + rotDiff.ToString() + "離れている" );
+	//	Debug.Log( "背後角度から" + rotDiff.ToString() + "離れている" );
 
 		return rotDiff <= thresholdDegree;
 
@@ -125,7 +132,4 @@ public class PlayerObserver : MonoBehaviour
 		//float distance = diff.magnitude;
 		//Debug.Log( "距離 : " + distance.ToString() );
 	}
-
-	// ①今いる場所で、正面に構造があるグローバル角度を求める
-	// ②グローバル角度から何度差があるか求める
 }
