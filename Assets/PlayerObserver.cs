@@ -1,16 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
 /// プレイヤーの行動に従ってアクションを実行する
 /// </summary>
 public class PlayerObserver : MonoBehaviour 
 {
-
 	/// <summary>
 	/// 変化させる構造
 	/// </summary>
-	public VariableStructure[] structures;
+	[SerializeField]
+	VariableStructure[] structures;
 
 	/// <summary>
 	/// 監視対象
@@ -20,7 +21,7 @@ public class PlayerObserver : MonoBehaviour
 	/// <summary>
 	/// 現在の条件で既にアクションが実行されたか？
 	/// </summary>
-	bool executedActionInCurrentCondition = false; 
+	List<bool> executedActionInCurrentConditions; 
 
 	/// <summary>
 	/// 範囲内と解釈する角度(degree)
@@ -30,32 +31,43 @@ public class PlayerObserver : MonoBehaviour
 	void Start()
 	{
 		observee = GameObject.Find("Player");
+		executedActionInCurrentConditions = new List<bool>();
+		for( int i=0 ; i < structures.Length ; i++ )
+		{
+			executedActionInCurrentConditions.Add(false);
+		}
+		//executedActionInCurrentConditions = new List<bool>(structures.Length);
 	}
 
 	void Update()
 	{
-		if( CheckCondition() ){
-			ExecuteAction();
+		for( int i=0 ; i < structures.Length ; i++ )
+		{
+			if( CheckCondition(i) ){
+				ExecuteAction(i);
+			}
 		}
+
 	}
 
 	/// <summary>
 	/// 条件を満たしているか調べる
 	/// </summary>
-	bool CheckCondition()
+	/// <param name="structureIndex">構造インデックス</param>
+	bool CheckCondition(int index)
 	{
 		if( observee == null ){
 			Debug.LogError("observeeが null");
 			return false;
 		}
 			
-		if( CheckIsTargetBackSide() ){
-			if( !executedActionInCurrentCondition){
-				executedActionInCurrentCondition = true;
+		if( CheckIsTargetBackSide(index) ){
+			if( !executedActionInCurrentConditions[index]){
+				executedActionInCurrentConditions[index] = true;
 				return true;
 			}
-		}else if(executedActionInCurrentCondition){
-			executedActionInCurrentCondition = false;
+		}else if(executedActionInCurrentConditions[index]){
+			executedActionInCurrentConditions[index] = false;
 		}
 
 		return false;
@@ -64,11 +76,10 @@ public class PlayerObserver : MonoBehaviour
 	/// <summary>
 	/// アクションを実行
 	/// </summary>
-	void ExecuteAction()
+	/// <param name="structureIndex">構造インデックス</param>
+	void ExecuteAction(int index)
 	{
-		foreach( VariableStructure s in structures ){
-			s.SwapStructure();
-		}
+		structures[index].SwapStructure();
 	}
 
 
@@ -94,17 +105,18 @@ public class PlayerObserver : MonoBehaviour
 	/// <summary>
 	/// 監視対象が管理している構造を背後に捉えているかどうか
 	/// </summary>
-	bool CheckIsTargetBackSide()
+	/// <param name="index">構造インデックス</param>
+	bool CheckIsTargetBackSide(int index)
 	{
 		// プレイヤーが有効な位置いいなければ判定しない
-		if( !structures[0].inArea )
+		if( !structures[index].inArea )
 		{
 			Debug.Log("プレイヤーが有効範囲にいない");
 			return false;
 		}
 
 		// 対象の構造に対してのどの方向を向いているか調べる
-		Vector3 tPos = structures[0].transform.position;
+		Vector3 tPos = structures[index].transform.position;
 		Vector3 pPos = observee.transform.position;
 
 		// プレイヤーからみて建物を正面にした時の角度(degree)を求める
