@@ -16,6 +16,7 @@ public class PlayerObserver : MonoBehaviour
 	/// <summary>
 	/// 監視対象
 	/// </summary>
+	[SerializeField]
 	GameObject observee;
 
 	/// <summary>
@@ -30,13 +31,11 @@ public class PlayerObserver : MonoBehaviour
 
 	void Start()
 	{
-		observee = GameObject.Find("Player");
 		executedActionInCurrentConditions = new List<bool>();
 		for( int i=0 ; i < structures.Length ; i++ )
 		{
 			executedActionInCurrentConditions.Add(false);
 		}
-		//executedActionInCurrentConditions = new List<bool>(structures.Length);
 	}
 
 	void Update()
@@ -79,6 +78,7 @@ public class PlayerObserver : MonoBehaviour
 	/// <param name="structureIndex">構造インデックス</param>
 	void ExecuteAction(int index)
 	{
+		Debug.Log("ExecuteAction");
 		structures[index].SwapStructure();
 	}
 
@@ -124,18 +124,18 @@ public class PlayerObserver : MonoBehaviour
 		// Debug.Log("正面の角度 : " + aim.ToString() );
 
 		float back = aim >= 180f ? aim - 180f : aim + 180f;
-	//	Debug.Log("背後の角度 : " + back.ToString() );
+		// Debug.Log("背後の角度 : " + back.ToString() );
 
 		// プレイヤーの角度(degree)
 		float pRot = observee.transform.rotation.eulerAngles.y;
-	//	Debug.Log( "プレイヤーの回転 : " + pRot.ToString() );
+		// Debug.Log( "プレイヤーの回転 : " + pRot.ToString() );
 
 		// 正面角度から何度の角度差があるか？
 		float rotDiff = Mathf.Abs( back - pRot );
 		if( rotDiff >= 180f ) {
 			rotDiff = 360f - rotDiff;
 		}
-	//	Debug.Log( "背後角度から" + rotDiff.ToString() + "離れている" );
+		// Debug.Log( "背後角度から" + rotDiff.ToString() + "離れている" );
 
 		return rotDiff <= thresholdDegree;
 

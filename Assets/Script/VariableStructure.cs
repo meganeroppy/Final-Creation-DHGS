@@ -21,6 +21,16 @@ public class VariableStructure : MonoBehaviour {
 	[SerializeField]
 	TriggerArea triggerArea;
 
+	/// <summary>
+	/// 一度でも変化したか？
+	/// </summary>
+	bool swapOnce = false;
+
+	/// <summary>
+	/// 繰り返し変化するか？
+	/// </summary>
+	public bool reversible = false;
+
 	public bool inArea
 	{
 		get{
@@ -31,11 +41,35 @@ public class VariableStructure : MonoBehaviour {
 			return triggerArea.inArea;
 		}
 	}
+
+	void Start()
+	{
+		// 有効になっている構造があったらそれのインデックスをカレントにする
+		for(int i=0 ; i < parts.Length ;i++)
+		{
+			if( parts[i].activeInHierarchy )
+			{
+				currentStructure = i;
+				break;
+			}
+		}
+
+	}
+
+
 	/// <summary>
 	/// 構造を変化させる
 	/// </summary>
 	public void SwapStructure()
 	{
+		if( swapOnce && !reversible )
+		{
+			Debug.Log("二度目はない");
+			return;
+		}
+
+		swapOnce = true;
+
 		// 構造インデックスを更新
 		currentStructure = currentStructure >= parts.Length-1 ? 0 : currentStructure+1;
 
@@ -45,13 +79,6 @@ public class VariableStructure : MonoBehaviour {
 		}
 	}
 
-	void OnTriggerStay(Collider col)
-	{
-		if( col.tag.Equals("Player") )
-		{
-			Debug.LogWarning("範囲内");
-		}
-	}
 }
 
 
